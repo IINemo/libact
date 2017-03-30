@@ -7,7 +7,7 @@ May be exported in different formats for application on other libraries.
 from __future__ import unicode_literals
 
 import random
-import numpy as np
+import numpy as np, scipy.sparse
 
 from libact.utils import zip
 
@@ -143,7 +143,11 @@ class Dataset(object):
             Sample labels.
         """
         X, y = zip(*self.get_labeled_entries())
-        return np.array(X), np.array(y)
+        if scipy.sparse.issparse(X[0]):
+            X = scipy.sparse.vstack(X)
+        else:
+            X = np.asarray(X)
+        return X, np.array(y)
 
     def get_entries(self):
         """

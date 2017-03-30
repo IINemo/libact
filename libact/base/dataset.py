@@ -12,6 +12,12 @@ import numpy as np, scipy.sparse
 from libact.utils import zip
 
 
+def ensure_sklearn_compat(feats):
+    if len(feats) > 0 and scipy.sparse.issparse(feats[0]):
+        return scipy.sparse.vstack(feats)
+    return numpy.asarray(feats)
+
+
 class Dataset(object):
 
     """libact dataset object
@@ -143,11 +149,7 @@ class Dataset(object):
             Sample labels.
         """
         X, y = zip(*self.get_labeled_entries())
-        if scipy.sparse.issparse(X[0]):
-            X = scipy.sparse.vstack(X)
-        else:
-            X = np.asarray(X)
-        return X, np.array(y)
+        return ensure_sklearn_compat(X), np.array(y)
 
     def get_entries(self):
         """

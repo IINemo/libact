@@ -8,6 +8,7 @@ from scipy.optimize import minimize
 from scipy.stats import multivariate_normal
 
 from libact.base.interfaces import QueryStrategy
+from libact.base.dataset import ensure_sklearn_compat
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 
@@ -89,16 +90,16 @@ class DWUS(QueryStrategy):
 
         self.kmeans_ = KMeans(n_clusters=self.n_clusts,
                               **kmeans_param)
-        all_x = np.array([xy[0] for xy in self.dataset.data])
+        all_x = ensure_sklearn_compat([xy[0] for xy in self.dataset.data])
 
         # Cluster the data.
         self.kmeans_.fit(all_x)
-        d = len(all_x[0])
+        d = all_x.shape[1]
 
         centers = self.kmeans_.cluster_centers_
         P_k = np.ones(self.n_clusts) / float(self.n_clusts)
 
-        dis = np.zeros((len(all_x), self.n_clusts))
+        dis = np.zeros((all_x.shape[0], self.n_clusts))
         for i in range(self.n_clusts):
             dis[:, i] = np.exp(-np.einsum('ij,ji->i', (all_x - centers[i]),
                 (all_x - centers[i]).T) / 2 / self.sigma)
@@ -106,16 +107,16 @@ class DWUS(QueryStrategy):
         # EM percedure to estimate the prior
         for _ in range(self.max_iter):
             # E-step P(k|x)
-            temp = dis * np.tile(P_k, (len(all_x), 1))
+            temp = dis * np.tile(P_k, (all_x.shape[0], 1))
             # P_k_x, shape = (len(all_x), n_clusts)
             P_k_x = temp / np.tile(np.sum(temp, axis=1), (self.n_clusts, 1)).T
 
             # M-step
-            P_k = 1./len(all_x) * np.sum(P_k_x, axis=0)
+            P_k = 1./all_x.shape[0] * np.sum(P_k_x, axis=0)
 
         self.P_k_x = P_k_x
 
-        p_x_k = np.zeros((len(all_x), self.n_clusts))
+        p_x_k = np.zeros((all_x.shape[0], self.n_clusts))
         for i in range(self.n_clusts):
             p_x_k[:, i] = multivariate_normal.pdf(
                 all_x, mean=centers[i], cov=np.ones(d)*np.sqrt(self.sigma))

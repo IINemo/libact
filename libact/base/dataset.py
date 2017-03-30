@@ -15,7 +15,7 @@ from libact.utils import zip
 def ensure_sklearn_compat(feats):
     if len(feats) > 0 and scipy.sparse.issparse(feats[0]):
         return scipy.sparse.vstack(feats)
-    return numpy.asarray(feats)
+    return np.asarray(feats)
 
 
 class Dataset(object):

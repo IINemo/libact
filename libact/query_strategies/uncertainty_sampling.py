@@ -9,6 +9,7 @@ import numpy as np
 
 from libact.base.interfaces import QueryStrategy, ContinuousModel, \
     ProbabilisticModel
+from libact.base.dataset import ensure_sklearn_compat
 from libact.utils import inherit_docstring_from, zip
 
 
@@ -114,6 +115,7 @@ class UncertaintySampling(QueryStrategy):
         self.model.train(dataset)
 
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        X_pool = ensure_sklearn_compat(X_pool)
 
         if isinstance(self.model, ProbabilisticModel):
             dvalue = self.model.predict_proba(X_pool)

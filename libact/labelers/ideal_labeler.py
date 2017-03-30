@@ -29,5 +29,5 @@ class IdealLabeler(Labeler):
 
     @inherit_docstring_from(Labeler)
     def label(self, feature):
-        return self.y[np.where([numpy.absolute(x - feature).sum() < 1e-6
+        return self.y[np.where([np.absolute(x - feature).sum() < 1e-6
                                 for x in self.X])[0][0]]

@@ -96,6 +96,9 @@ class UncertaintySampling(QueryStrategy):
                 "method 'entropy' requires model to be a ProbabilisticModel"
             )
 
+    def update(self, new_indexes, labels):
+        self.model.train(self.dataset, new_indexes)
+
     def make_query(self, return_score=False):
         """Return the index of the sample to be queried and labeled and
         selection score of each sample. Read-only.
@@ -112,7 +115,7 @@ class UncertaintySampling(QueryStrategy):
 
         """
         dataset = self.dataset
-        self.model.train(dataset)
+#        self.model.train(dataset)
 
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
         X_pool = ensure_sklearn_compat(X_pool)

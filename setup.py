@@ -34,6 +34,7 @@ else:
             "libact.query_strategies._variance_reduction",
             ["libact/query_strategies/src/variance_reduction/variance_reduction.c"],
             extra_link_args=extra_link_args,
+            libraries=["lapack", 'lapacke', 'blas'],
             extra_compile_args=['-std=c11'],
             include_dirs=include_dirs,
         ),

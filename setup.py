@@ -25,7 +25,7 @@ else:
     else:
         # assume linux otherwise, unless we support Windows in the future...
         print("Platform Detection: Linux. Link to liblapacke...")
-        extra_link_args = ['-llapacke -llapack -lblas']
+        extra_link_args = ['-L /usr/lib -llapacke -llapack -lblas']
         include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
                         ['/usr/include/lapacke'])
 
